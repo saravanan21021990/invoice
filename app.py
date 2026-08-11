@@ -120,6 +120,7 @@ if submitted:
         sig_html = f'<img src="{sign_path}" style="max-height: 45px;">' if sign_path else '<br><br>'
 
         # Handle Probe Row
+        # Removed the Rs. 0.00 (0.0%) visual text and replaced with a clean dash "-"
         probe_row = ""
         if probe_cost > 0:
             probe_row = f"""
@@ -130,7 +131,7 @@ if submitted:
                 <td style="border-right: 1px solid #111;" class="text-right">1</td>
                 <td style="border-right: 1px solid #111;" class="text-center">-</td>
                 <td style="border-right: 1px solid #111;" class="text-right">Rs. {probe_cost:,.2f}</td>
-                <td style="border-right: 1px solid #111;" class="text-right">Rs. 0.00<br>(0.0%)</td>
+                <td style="border-right: 1px solid #111;" class="text-center">-</td>
                 <td class="text-right">Rs. {probe_cost:,.2f}</td>
             </tr>
             """
@@ -138,7 +139,7 @@ if submitted:
         # Ensure item name is not completely blank in the PDF
         display_item_name = item_name if item_name.strip() else "Electrolysis"
 
-        # HTML table layout replacing ₹ with Rs.
+        # HTML table layout
         html_template = f"""
         <html>
         <head>

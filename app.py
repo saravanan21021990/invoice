@@ -76,51 +76,71 @@ if submitted:
         date_str = datetime.now().strftime("%d-%m-%Y")
         amount_words = number_to_words(int(round(total_due)))
 
-        # xhtml2pdf handles absolute local paths well
+        # Absolute paths for local files
         logo_path = os.path.abspath("logo.png") if os.path.exists("logo.png") else ""
         sign_path = os.path.abspath("indu_sign.png") if os.path.exists("indu_sign.png") else ""
 
         logo_html = f'<img src="{logo_path}" style="max-height: 90px;">' if logo_path else '<div style="height: 90px; text-align:center;">LOGO</div>'
         sig_html = f'<img src="{sign_path}" style="max-height: 50px;">' if sign_path else '<br><br><br>'
 
-        discount_html = ""
-        if discount_percent > 0:
-            discount_html = f"""
+        # Handle Discount display
+        disc_label = f"Discount ({discount_percent:g}%)<br>" if discount_percent > 0 else ""
+        disc_val = f": - ₹ {discount_amount:,.2f}<br>" if discount_percent > 0 else ""
+
+        # Handle Probe Row
+        probe_row = ""
+        if probe_cost > 0:
+            probe_row = f"""
             <tr>
-                <td width="50%" style="padding: 6px;">Discount ({discount_percent:g}%)</td>
-                <td width="50%" class="text-right" style="padding: 6px;">: - ₹ {discount_amount:,.2f}</td>
+                <td style="border-left: none; text-align: center;">2</td>
+                <td>Probe</td>
+                <td></td>
+                <td class="text-right">1.00</td>
+                <td class="text-center">-</td>
+                <td class="text-right">₹ {probe_cost:,.2f}</td>
+                <td style="border-right: none;" class="text-right">₹ {probe_cost:,.2f}</td>
             </tr>
             """
 
-        # STRICT HTML Widths to prevent xhtml2pdf collapsing the tables
+        # FLAT HTML Template (No Nested Tables) - Guaranteed to fix spacing crash
         html_template = f"""
         <html>
         <head>
         <style>
             @page {{ size: A4; margin: 1.5cm; }}
-            body {{ font-family: Helvetica, Arial, sans-serif; font-size: 10pt; color: #111; }}
-            .invoice-header {{ text-align: center; font-size: 18pt; font-weight: bold; margin-bottom: 15px; }}
-            .box {{ border: 1px solid #111; }}
-            table {{ border-collapse: collapse; }}
-            td, th {{ padding: 6px; vertical-align: top; }}
-            .border-bottom {{ border-bottom: 1px solid #111; }}
-            .border-right {{ border-right: 1px solid #111; }}
-            .border-top {{ border-top: 1px solid #111; }}
-            .bg-light {{ background-color: #f4f2f5; font-weight: bold; }}
-            .text-right {{ text-align: right; }}
+            body {{ font-family: Helvetica, Arial, sans-serif; font-size: 10.5pt; color: #111; }}
             .text-center {{ text-align: center; }}
+            .text-right {{ text-align: right; }}
             .bold {{ font-weight: bold; }}
+            .bg-light {{ background-color: #f4f2f5; }}
+            
+            /* Main container border */
+            .box {{ border: 1.5px solid #111; }}
+            
+            /* Table Standards */
+            table {{ width: 100%; border-collapse: collapse; }}
+            td, th {{ padding: 8px; vertical-align: top; }}
+            
+            /* Border Utilities */
+            .b-bottom {{ border-bottom: 1px solid #111; }}
+            .b-right {{ border-right: 1px solid #111; }}
+            .b-top {{ border-top: 1px solid #111; }}
+            
+            /* Items Table Specific */
+            .items-table th, .items-table td {{ border: 1px solid #111; }}
         </style>
         </head>
         <body>
-            <div class="invoice-header">Tax Invoice</div>
+            <div class="text-center bold" style="font-size: 18pt; margin-bottom: 15px;">Tax Invoice</div>
             
             <div class="box">
-                <!-- Clinic Header -->
-                <table width="100%" class="border-bottom">
+                <!-- Header Section -->
+                <table class="b-bottom">
                     <tr>
-                        <td width="25%" style="text-align: center;" class="border-right">{logo_html}</td>
-                        <td width="75%" style="padding-left: 15px; vertical-align: middle;">
+                        <td style="width: 25%; text-align: center;" class="b-right">
+                            {logo_html}
+                        </td>
+                        <td style="width: 75%; padding-left: 20px; vertical-align: middle;">
                             <span style="font-size: 16pt; font-weight: bold; color: #222;">JesRa Electrolysis</span><br><br>
                             <span style="color: #444;">No.414/69, 9th main, Vijayanagar, Bangalore</span><br><br>
                             Phone: <strong>9964847715</strong> &nbsp;&nbsp;&nbsp;&nbsp; Email: <strong>jesra.electrolysis@gmail.com</strong>
@@ -128,112 +148,106 @@ if submitted:
                     </tr>
                 </table>
 
-                <!-- Bill To -->
-                <table width="100%" class="border-bottom">
-                    <tr>
-                        <td width="50%" class="bg-light border-right">Bill To:</td>
-                        <td width="50%" class="bg-light">Invoice Details:</td>
+                <!-- Bill To Section -->
+                <table class="b-bottom">
+                    <tr class="bg-light b-bottom">
+                        <td style="width: 50%;" class="b-right bold">Bill To:</td>
+                        <td style="width: 50%;" class="bold">Invoice Details:</td>
                     </tr>
                     <tr>
-                        <td width="50%" class="border-right">
-                            <span class="bold" style="font-size: 11pt;">{client_name.title()}</span><br><br>
+                        <td style="width: 50%;" class="b-right">
+                            <span class="bold" style="font-size: 12pt;">{client_name.title()}</span><br><br>
                             Contact No: <span class="bold">{contact_no}</span>
                         </td>
-                        <td width="50%">
+                        <td style="width: 50%;">
                             No: <span class="bold">{inv_no}</span><br><br>
                             Date: <span class="bold">{date_str}</span>
                         </td>
                     </tr>
                 </table>
 
-                <!-- Items -->
-                <table width="100%" class="border-bottom">
+                <!-- Items Section -->
+                <table class="items-table" style="border: none; border-bottom: 1px solid #111;">
                     <tr class="bg-light">
-                        <td width="7%" class="border-right border-bottom text-center">#</td>
-                        <td width="30%" class="border-right border-bottom">Item Name</td>
-                        <td width="13%" class="border-right border-bottom">HSN/ SAC</td>
-                        <td width="12%" class="border-right border-bottom text-right">Qty</td>
-                        <td width="10%" class="border-right border-bottom text-center">Unit</td>
-                        <td width="14%" class="border-right border-bottom text-right">Price (₹)</td>
-                        <td width="14%" class="border-bottom text-right">Amount(₹)</td>
+                        <th style="width: 5%; border-top: none; border-left: none;" class="text-center">#</th>
+                        <th style="width: 35%; border-top: none;">Item Name</th>
+                        <th style="width: 12%; border-top: none;">HSN/ SAC</th>
+                        <th style="width: 10%; border-top: none;" class="text-right">Qty</th>
+                        <th style="width: 8%; border-top: none;" class="text-center">Unit</th>
+                        <th style="width: 15%; border-top: none;" class="text-right">Price (₹)</th>
+                        <th style="width: 15%; border-top: none; border-right: none;" class="text-right">Amount(₹)</th>
                     </tr>
                     <tr>
-                        <td width="7%" class="border-right text-center">1</td>
-                        <td width="30%" class="border-right">Electrolysis</td>
-                        <td width="13%" class="border-right"></td>
-                        <td width="12%" class="border-right text-right">{hours_qty:.2f}</td>
-                        <td width="10%" class="border-right text-center">Hur</td>
-                        <td width="14%" class="border-right text-right">₹ {base_rate * 2:,.2f}</td>
-                        <td width="14%" class="text-right">₹ {service_amount:,.2f}</td>
+                        <td style="border-left: none;" class="text-center">1</td>
+                        <td>Electrolysis</td>
+                        <td></td>
+                        <td class="text-right">{hours_qty:.2f}</td>
+                        <td class="text-center">Hur</td>
+                        <td class="text-right">₹ {base_rate * 2:,.2f}</td>
+                        <td style="border-right: none;" class="text-right">₹ {service_amount:,.2f}</td>
                     </tr>
-                    {"<tr><td width='7%' class='border-right text-center'>2</td><td width='30%' class='border-right'>Probe</td><td width='13%' class='border-right'></td><td width='12%' class='border-right text-right'>1.00</td><td width='10%' class='border-right text-center'>-</td><td width='14%' class='border-right text-right'>₹ " + f"{probe_cost:,.2f}</td><td width='14%' class='text-right'>₹ {probe_cost:,.2f}</td></tr>" if probe_cost > 0 else ""}
+                    {probe_row}
                     <tr>
-                        <td class="border-right"><br><br><br><br><br></td>
-                        <td class="border-right"></td><td class="border-right"></td><td class="border-right"></td><td class="border-right"></td><td class="border-right"></td><td></td>
+                        <td style="border-left: none;"><br><br><br><br><br><br></td>
+                        <td></td><td></td><td></td><td></td><td></td>
+                        <td style="border-right: none;"></td>
                     </tr>
                     <tr>
-                        <td colspan="3" class="border-top border-right bold">Total</td>
-                        <td class="border-top border-right bold text-right">{total_qty:.2f}</td>
-                        <td class="border-top border-right"></td>
-                        <td class="border-top border-right"></td>
-                        <td class="border-top bold text-right">₹ {subtotal:,.2f}</td>
+                        <td colspan="3" style="border-left: none;" class="bold b-top text-right">Total</td>
+                        <td class="bold b-top text-right">{total_qty:.2f}</td>
+                        <td class="b-top"></td>
+                        <td class="b-top"></td>
+                        <td style="border-right: none;" class="bold b-top text-right">₹ {subtotal:,.2f}</td>
                     </tr>
                 </table>
 
-                <!-- Summary -->
-                <table width="100%" class="border-bottom">
+                <!-- Summary Section (Using <br> instead of nested tables) -->
+                <table class="b-bottom">
                     <tr>
-                        <td width="52%" class="border-right"></td>
-                        <td width="48%" style="padding: 0;">
-                            <table width="100%">
-                                <tr>
-                                    <td width="50%" style="padding: 6px;">Sub Total</td>
-                                    <td width="50%" class="text-right" style="padding: 6px;">: ₹ {subtotal:,.2f}</td>
-                                </tr>
-                                {discount_html}
-                                <tr>
-                                    <td width="50%" class="border-top bold" style="padding: 6px;">Total</td>
-                                    <td width="50%" class="border-top bold text-right" style="padding: 6px;">: ₹ {total_due:,.2f}</td>
-                                </tr>
-                            </table>
+                        <td style="width: 60%;" class="b-right"></td>
+                        <td style="width: 20%; padding: 8px;">
+                            Sub Total<br><br>
+                            {disc_label}
+                            <span class="bold">Total</span>
+                        </td>
+                        <td style="width: 20%; padding: 8px;" class="text-right">
+                            : ₹ {subtotal:,.2f}<br><br>
+                            {disc_val}
+                            <span class="bold">: ₹ {total_due:,.2f}</span>
                         </td>
                     </tr>
                 </table>
 
-                <!-- Words -->
-                <div class="border-bottom" style="padding: 8px;">
-                    <span class="bold">Invoice Amount In Words :</span><br>
+                <!-- Amount In Words -->
+                <div class="b-bottom" style="padding: 10px;">
+                    <span class="bold">Invoice Amount In Words :</span><br><br>
                     {amount_words}
                 </div>
 
-                <!-- Footer -->
-                <table width="100%">
+                <!-- Footer Section (Using <br> instead of nested tables) -->
+                <table>
                     <tr>
-                        <td width="52%" class="border-right">
-                            <span class="bold">Description:</span><br>
+                        <td style="width: 60%; padding: 10px;" class="b-right">
+                            <span class="bold">Description:</span><br><br>
                             {description}
                         </td>
-                        <td width="48%" style="padding: 0;">
-                            <table width="100%">
-                                <tr>
-                                    <td width="50%" style="padding: 6px;">Received</td>
-                                    <td width="50%" class="text-right" style="padding: 6px;">: ₹ {amount_received:,.2f}</td>
-                                </tr>
-                                <tr>
-                                    <td width="50%" style="padding: 6px;">Balance</td>
-                                    <td width="50%" class="text-right" style="padding: 6px;">: ₹ {balance:,.2f}</td>
-                                </tr>
-                            </table>
+                        <td style="width: 20%; padding: 10px;">
+                            Received<br><br>
+                            Balance
+                        </td>
+                        <td style="width: 20%; padding: 10px;" class="text-right">
+                            : ₹ {amount_received:,.2f}<br><br>
+                            : ₹ {balance:,.2f}
                         </td>
                     </tr>
                 </table>
             </div>
 
-            <!-- Signatory -->
-            <table width="100%" style="margin-top: 15px;">
+            <!-- Signatory Area -->
+            <table style="margin-top: 15px; border: none;">
                 <tr>
-                    <td width="60%"></td>
-                    <td width="40%" style="text-align: right;">
+                    <td style="width: 60%;"></td>
+                    <td style="width: 40%; text-align: right; border: none;">
                         <span class="bold">For JesRa Electrolysis:</span><br>
                         {sig_html}<br>
                         <span class="bold">Authorized Signatory</span>

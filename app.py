@@ -80,19 +80,19 @@ if submitted:
         logo_path = os.path.abspath("logo.png") if os.path.exists("logo.png") else ""
         sign_path = os.path.abspath("indu_sign.png") if os.path.exists("indu_sign.png") else ""
 
-        logo_html = f'<img src="{logo_path}" style="max-height: 100px;">' if logo_path else '<div style="height: 100px; text-align:center;">LOGO</div>'
+        logo_html = f'<img src="{logo_path}" style="max-height: 90px;">' if logo_path else '<div style="height: 90px; text-align:center;">LOGO</div>'
         sig_html = f'<img src="{sign_path}" style="max-height: 50px;">' if sign_path else '<br><br><br>'
 
         discount_html = ""
         if discount_percent > 0:
             discount_html = f"""
             <tr>
-                <td style="padding: 4px;">Discount ({discount_percent:g}%)</td>
-                <td class="text-right" style="padding: 4px;">: - ₹ {discount_amount:,.2f}</td>
+                <td width="50%" style="padding: 6px;">Discount ({discount_percent:g}%)</td>
+                <td width="50%" class="text-right" style="padding: 6px;">: - ₹ {discount_amount:,.2f}</td>
             </tr>
             """
 
-        # HTML Template optimized for xhtml2pdf padding bug
+        # STRICT HTML Widths to prevent xhtml2pdf collapsing the tables
         html_template = f"""
         <html>
         <head>
@@ -101,9 +101,8 @@ if submitted:
             body {{ font-family: Helvetica, Arial, sans-serif; font-size: 10pt; color: #111; }}
             .invoice-header {{ text-align: center; font-size: 18pt; font-weight: bold; margin-bottom: 15px; }}
             .box {{ border: 1px solid #111; }}
-            table {{ width: 100%; border-collapse: collapse; }}
-            /* Reduced padding from 6px 8px to 4px to prevent availWidth errors */
-            td, th {{ padding: 4px; vertical-align: top; }}
+            table {{ border-collapse: collapse; }}
+            td, th {{ padding: 6px; vertical-align: top; }}
             .border-bottom {{ border-bottom: 1px solid #111; }}
             .border-right {{ border-right: 1px solid #111; }}
             .border-top {{ border-top: 1px solid #111; }}
@@ -118,10 +117,10 @@ if submitted:
             
             <div class="box">
                 <!-- Clinic Header -->
-                <table class="border-bottom">
+                <table width="100%" class="border-bottom">
                     <tr>
-                        <td style="width: 25%; text-align: center;" class="border-right">{logo_html}</td>
-                        <td style="width: 75%; padding-left: 15px; vertical-align: middle;">
+                        <td width="25%" style="text-align: center;" class="border-right">{logo_html}</td>
+                        <td width="75%" style="padding-left: 15px; vertical-align: middle;">
                             <span style="font-size: 16pt; font-weight: bold; color: #222;">JesRa Electrolysis</span><br><br>
                             <span style="color: #444;">No.414/69, 9th main, Vijayanagar, Bangalore</span><br><br>
                             Phone: <strong>9964847715</strong> &nbsp;&nbsp;&nbsp;&nbsp; Email: <strong>jesra.electrolysis@gmail.com</strong>
@@ -130,17 +129,17 @@ if submitted:
                 </table>
 
                 <!-- Bill To -->
-                <table class="border-bottom">
+                <table width="100%" class="border-bottom">
                     <tr>
-                        <td class="bg-light border-right" style="width: 50%;">Bill To:</td>
-                        <td class="bg-light" style="width: 50%;">Invoice Details:</td>
+                        <td width="50%" class="bg-light border-right">Bill To:</td>
+                        <td width="50%" class="bg-light">Invoice Details:</td>
                     </tr>
                     <tr>
-                        <td class="border-right">
+                        <td width="50%" class="border-right">
                             <span class="bold" style="font-size: 11pt;">{client_name.title()}</span><br><br>
                             Contact No: <span class="bold">{contact_no}</span>
                         </td>
-                        <td>
+                        <td width="50%">
                             No: <span class="bold">{inv_no}</span><br><br>
                             Date: <span class="bold">{date_str}</span>
                         </td>
@@ -148,28 +147,28 @@ if submitted:
                 </table>
 
                 <!-- Items -->
-                <table class="border-bottom">
+                <table width="100%" class="border-bottom">
                     <tr class="bg-light">
-                        <td class="border-right border-bottom text-center" style="width: 7%;">#</td>
-                        <td class="border-right border-bottom" style="width: 30%;">Item Name</td>
-                        <td class="border-right border-bottom" style="width: 13%;">HSN/ SAC</td>
-                        <td class="border-right border-bottom text-right" style="width: 12%;">Quantity</td>
-                        <td class="border-right border-bottom text-center" style="width: 10%;">Unit</td>
-                        <td class="border-right border-bottom text-right" style="width: 14%;">Price/ Unit (₹)</td>
-                        <td class="border-bottom text-right" style="width: 14%;">Amount(₹)</td>
+                        <td width="7%" class="border-right border-bottom text-center">#</td>
+                        <td width="30%" class="border-right border-bottom">Item Name</td>
+                        <td width="13%" class="border-right border-bottom">HSN/ SAC</td>
+                        <td width="12%" class="border-right border-bottom text-right">Qty</td>
+                        <td width="10%" class="border-right border-bottom text-center">Unit</td>
+                        <td width="14%" class="border-right border-bottom text-right">Price (₹)</td>
+                        <td width="14%" class="border-bottom text-right">Amount(₹)</td>
                     </tr>
                     <tr>
-                        <td class="border-right text-center">1</td>
-                        <td class="border-right">Electrolysis Treatment</td>
-                        <td class="border-right"></td>
-                        <td class="border-right text-right">{hours_qty:.2f}</td>
-                        <td class="border-right text-center">Hur</td>
-                        <td class="border-right text-right">₹ {base_rate * 2:,.2f}</td>
-                        <td class="text-right">₹ {service_amount:,.2f}</td>
+                        <td width="7%" class="border-right text-center">1</td>
+                        <td width="30%" class="border-right">Electrolysis</td>
+                        <td width="13%" class="border-right"></td>
+                        <td width="12%" class="border-right text-right">{hours_qty:.2f}</td>
+                        <td width="10%" class="border-right text-center">Hur</td>
+                        <td width="14%" class="border-right text-right">₹ {base_rate * 2:,.2f}</td>
+                        <td width="14%" class="text-right">₹ {service_amount:,.2f}</td>
                     </tr>
-                    {"<tr><td class='border-right text-center'>2</td><td class='border-right'>Probe</td><td class='border-right'></td><td class='border-right text-right'>1.00</td><td class='border-right text-center'>-</td><td class='border-right text-right'>₹ " + f"{probe_cost:,.2f}</td><td class='text-right'>₹ {probe_cost:,.2f}</td></tr>" if probe_cost > 0 else ""}
+                    {"<tr><td width='7%' class='border-right text-center'>2</td><td width='30%' class='border-right'>Probe</td><td width='13%' class='border-right'></td><td width='12%' class='border-right text-right'>1.00</td><td width='10%' class='border-right text-center'>-</td><td width='14%' class='border-right text-right'>₹ " + f"{probe_cost:,.2f}</td><td width='14%' class='text-right'>₹ {probe_cost:,.2f}</td></tr>" if probe_cost > 0 else ""}
                     <tr>
-                        <td class="border-right"><br><br><br><br><br><br><br><br></td>
+                        <td class="border-right"><br><br><br><br><br></td>
                         <td class="border-right"></td><td class="border-right"></td><td class="border-right"></td><td class="border-right"></td><td class="border-right"></td><td></td>
                     </tr>
                     <tr>
@@ -182,19 +181,19 @@ if submitted:
                 </table>
 
                 <!-- Summary -->
-                <table class="border-bottom">
+                <table width="100%" class="border-bottom">
                     <tr>
-                        <td style="width: 52%;" class="border-right"></td>
-                        <td style="width: 48%; padding: 0;">
-                            <table>
+                        <td width="52%" class="border-right"></td>
+                        <td width="48%" style="padding: 0;">
+                            <table width="100%">
                                 <tr>
-                                    <td style="padding: 4px;">Sub Total</td>
-                                    <td class="text-right" style="padding: 4px;">: ₹ {subtotal:,.2f}</td>
+                                    <td width="50%" style="padding: 6px;">Sub Total</td>
+                                    <td width="50%" class="text-right" style="padding: 6px;">: ₹ {subtotal:,.2f}</td>
                                 </tr>
                                 {discount_html}
                                 <tr>
-                                    <td class="border-top bold" style="padding: 4px;">Total</td>
-                                    <td class="border-top bold text-right" style="padding: 4px;">: ₹ {total_due:,.2f}</td>
+                                    <td width="50%" class="border-top bold" style="padding: 6px;">Total</td>
+                                    <td width="50%" class="border-top bold text-right" style="padding: 6px;">: ₹ {total_due:,.2f}</td>
                                 </tr>
                             </table>
                         </td>
@@ -208,21 +207,21 @@ if submitted:
                 </div>
 
                 <!-- Footer -->
-                <table>
+                <table width="100%">
                     <tr>
-                        <td style="width: 52%;" class="border-right">
+                        <td width="52%" class="border-right">
                             <span class="bold">Description:</span><br>
                             {description}
                         </td>
-                        <td style="width: 48%; padding: 0;">
-                            <table>
+                        <td width="48%" style="padding: 0;">
+                            <table width="100%">
                                 <tr>
-                                    <td style="padding: 4px;">Received</td>
-                                    <td class="text-right" style="padding: 4px;">: ₹ {amount_received:,.2f}</td>
+                                    <td width="50%" style="padding: 6px;">Received</td>
+                                    <td width="50%" class="text-right" style="padding: 6px;">: ₹ {amount_received:,.2f}</td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 4px;">Balance</td>
-                                    <td class="text-right" style="padding: 4px;">: ₹ {balance:,.2f}</td>
+                                    <td width="50%" style="padding: 6px;">Balance</td>
+                                    <td width="50%" class="text-right" style="padding: 6px;">: ₹ {balance:,.2f}</td>
                                 </tr>
                             </table>
                         </td>
@@ -231,10 +230,10 @@ if submitted:
             </div>
 
             <!-- Signatory -->
-            <table style="margin-top: 10px;">
+            <table width="100%" style="margin-top: 15px;">
                 <tr>
-                    <td style="width: 60%;"></td>
-                    <td style="width: 40%; text-align: right;">
+                    <td width="60%"></td>
+                    <td width="40%" style="text-align: right;">
                         <span class="bold">For JesRa Electrolysis:</span><br>
                         {sig_html}<br>
                         <span class="bold">Authorized Signatory</span>
@@ -248,7 +247,6 @@ if submitted:
 
         try:
             with st.spinner("Generating PDF..."):
-                # Generate PDF using pure python (xhtml2pdf) directly into memory
                 pdf_buffer = io.BytesIO()
                 pisa_status = pisa.CreatePDF(html_template, dest=pdf_buffer)
                 

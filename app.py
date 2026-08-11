@@ -27,6 +27,22 @@ def number_to_words(n):
         result += convert_below_1000(n)
     return result.strip() + " Rupees only"
 
+# Auto-increment logic using a local file
+INV_FILE = "invoice_no.txt"
+def get_next_invoice_no():
+    if os.path.exists(INV_FILE):
+        with open(INV_FILE, "r") as f:
+            try:
+                return int(f.read().strip())
+            except ValueError:
+                return 1
+    return 1
+
+def increment_invoice_no():
+    current = get_next_invoice_no()
+    with open(INV_FILE, "w") as f:
+        f.write(str(current + 1))
+
 # --- Web App UI ---
 st.set_page_config(page_title="JesRa Billing System", layout="centered")
 
@@ -36,25 +52,25 @@ st.markdown("Generate and download professional PDF invoices directly to your de
 # --- Input Form ---
 with st.form("invoice_form"):
     st.subheader("1. Clinic Settings")
-    inv_no = st.text_input("Invoice Number", value="4")
+    inv_no = st.text_input("Invoice Number", value=str(get_next_invoice_no()))
     
     st.subheader("2. Client Details")
     client_name = st.text_input("Client Name", placeholder="e.g., Kavya")
     contact_no = st.text_input("Contact Number", placeholder="e.g., 9632036238")
 
     st.subheader("3. Service & Rate Details")
-    col3, col4 = st.columns(2)
-    duration_minutes = col3.number_input("Duration (minutes)", min_value=0.0, value=240.0, step=30.0)
-    probe_cost = col4.number_input("Probe Charge (Rs.)", min_value=0.0, value=300.0, step=10.0)
+    col_h, col_m, col_p = st.columns([1, 1, 1.5])
+    dur_hours = col_h.number_input("Hours", min_value=0, value=0, step=1)
+    dur_mins = col_m.number_input("Minutes", min_value=0, max_value=59, value=0, step=5)
+    probe_cost = col_p.number_input("Probe Charge (Rs.)", min_value=0.0, value=0.0, step=10.0)
     
     col5, col6 = st.columns(2)
-    standard_rate_30m = col5.number_input("Standard Base Price (per 30 mins Rs.)", min_value=1.0, value=800.0, step=50.0)
-    # Changed to take the direct discount amount instead of the discounted price
-    discount_per_30m = col6.number_input("Discount (per 30 mins Rs.)", min_value=0.0, value=100.0, step=50.0)
+    standard_rate_30m = col5.number_input("Standard Base Price (per 30 mins Rs.)", min_value=0.0, value=0.0, step=50.0)
+    discount_per_30m = col6.number_input("Discount (per 30 mins Rs.)", min_value=0.0, value=0.0, step=50.0)
     
     col7, col8 = st.columns(2)
-    amount_received = col7.number_input("Amount Received (Rs.)", min_value=0.0, value=5900.0, step=50.0)
-    item_name = col8.text_input("Item Name / Description", value="Fine hair")
+    amount_received = col7.number_input("Amount Received (Rs.)", min_value=0.0, value=0.0, step=50.0)
+    item_name = col8.text_input("Item Name / Description", value="", placeholder="e.g., Fine hair")
 
     submitted = st.form_submit_button("Generate PDF Invoice")
 
@@ -64,7 +80,10 @@ if submitted:
         st.error("Please enter a client name.")
     else:
         # --- Calculations ---
-        hours_qty = duration_minutes / 60.0
+        # Convert total duration into fractional hours
+        total_duration_minutes = (dur_hours * 60) + dur_mins
+        hours_qty = total_duration_minutes / 60.0
+        
         total_qty = hours_qty + (1 if probe_cost > 0 else 0)
         
         # Calculate Hourly Rates based on the 30-min inputs
@@ -115,6 +134,9 @@ if submitted:
                 <td class="text-right">Rs. {probe_cost:,.2f}</td>
             </tr>
             """
+
+        # Ensure item name is not completely blank in the PDF
+        display_item_name = item_name if item_name.strip() else "Electrolysis"
 
         # HTML table layout replacing ₹ with Rs.
         html_template = f"""
@@ -175,7 +197,7 @@ if submitted:
                 </tr>
                 <tr>
                     <td style="border-right: 1px solid #111;" class="text-center">1</td>
-                    <td style="border-right: 1px solid #111;">{item_name}</td>
+                    <td style="border-right: 1px solid #111;">{display_item_name}</td>
                     <td style="border-right: 1px solid #111;"></td>
                     <td style="border-right: 1px solid #111;" class="text-right">{hours_qty:g}</td>
                     <td style="border-right: 1px solid #111;" class="text-center">Hur</td>
@@ -264,7 +286,13 @@ if submitted:
                     st.error("An error occurred during PDF rendering.")
                 else:
                     pdf_bytes = pdf_buffer.getvalue()
+                    
+                    # Successfully generated PDF, let's increment the file!
+                    increment_invoice_no()
+                    
                     st.success("Invoice generated successfully!")
+                    st.info("Invoice number has been automatically incremented for the next bill.")
+                    
                     st.download_button(
                         label="Download PDF Invoice",
                         data=pdf_bytes,

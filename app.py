@@ -102,7 +102,6 @@ if submitted:
             </tr>
             """
 
-        # FLAT HTML Template (No Nested Tables) - Guaranteed to fix spacing crash
         html_template = f"""
         <html>
         <head>
@@ -119,7 +118,8 @@ if submitted:
             
             /* Table Standards */
             table {{ width: 100%; border-collapse: collapse; }}
-            td, th {{ padding: 8px; vertical-align: top; }}
+            /* PADDING REDUCED TO 4px to prevent availWidth crashes */
+            td, th {{ padding: 4px 6px; vertical-align: top; }}
             
             /* Border Utilities */
             .b-bottom {{ border-bottom: 1px solid #111; }}
@@ -166,11 +166,11 @@ if submitted:
                     </tr>
                 </table>
 
-                <!-- Items Section -->
+                <!-- Items Section: Column Widths Increased to prevent crash -->
                 <table class="items-table" style="border: none; border-bottom: 1px solid #111;">
                     <tr class="bg-light">
-                        <th style="width: 5%; border-top: none; border-left: none;" class="text-center">#</th>
-                        <th style="width: 35%; border-top: none;">Item Name</th>
+                        <th style="width: 8%; border-top: none; border-left: none;" class="text-center">#</th>
+                        <th style="width: 32%; border-top: none;">Item Name</th>
                         <th style="width: 12%; border-top: none;">HSN/ SAC</th>
                         <th style="width: 10%; border-top: none;" class="text-right">Qty</th>
                         <th style="width: 8%; border-top: none;" class="text-center">Unit</th>
@@ -201,7 +201,7 @@ if submitted:
                     </tr>
                 </table>
 
-                <!-- Summary Section (Using <br> instead of nested tables) -->
+                <!-- Summary Section -->
                 <table class="b-bottom">
                     <tr>
                         <td style="width: 60%;" class="b-right"></td>
@@ -224,7 +224,7 @@ if submitted:
                     {amount_words}
                 </div>
 
-                <!-- Footer Section (Using <br> instead of nested tables) -->
+                <!-- Footer Section -->
                 <table>
                     <tr>
                         <td style="width: 60%; padding: 10px;" class="b-right">

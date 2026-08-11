@@ -48,7 +48,6 @@ with st.form("invoice_form"):
     probe_cost = col4.number_input("Probe Charge (₹)", min_value=0.0, value=300.0, step=10.0)
     
     col5, col6 = st.columns(2)
-    # New inputs for Standard vs Discounted Pricing
     standard_rate_30m = col5.number_input("Standard Base Price (per 30 mins ₹)", min_value=1.0, value=800.0, step=50.0)
     discounted_rate_30m = col6.number_input("Discounted Price (per 30 mins ₹)", min_value=0.0, value=700.0, step=50.0)
     
@@ -79,7 +78,7 @@ if submitted:
         # Percentage Calculation
         item1_discount_percent = (item1_discount_amount / item1_standard_total * 100) if item1_standard_total > 0 else 0
         
-        # Probe Totals (Probe usually doesn't have a discount)
+        # Probe Totals
         probe_discount_amount = 0.0
         probe_total = probe_cost
         
@@ -100,7 +99,7 @@ if submitted:
         logo_html = f'<img src="{logo_path}" style="max-height: 80px;">' if logo_path else '<div style="height: 80px; text-align:center;">LOGO</div>'
         sig_html = f'<img src="{sign_path}" style="max-height: 45px;">' if sign_path else '<br><br>'
 
-        # Handle Probe Row with new structure
+        # Handle Probe Row
         probe_row = ""
         if probe_cost > 0:
             probe_row = f"""
@@ -110,13 +109,13 @@ if submitted:
                 <td style="border-right: 1px solid #111;"></td>
                 <td style="border-right: 1px solid #111;" class="text-right">1</td>
                 <td style="border-right: 1px solid #111;" class="text-center">-</td>
-                <td style="border-right: 1px solid #111;" class="text-right">₹ {probe_cost:,.2f}</td>
-                <td style="border-right: 1px solid #111;" class="text-right">₹ 0.00<br>(0.0%)</td>
-                <td class="text-right">₹ {probe_cost:,.2f}</td>
+                <td style="border-right: 1px solid #111;" class="text-right">Rs. {probe_cost:,.2f}</td>
+                <td style="border-right: 1px solid #111;" class="text-right">Rs. 0.00<br>(0.0%)</td>
+                <td class="text-right">Rs. {probe_cost:,.2f}</td>
             </tr>
             """
 
-        # HTML table layout matching your screenshot
+        # HTML table layout replacing ₹ with Rs.
         html_template = f"""
         <html>
         <head>
@@ -161,7 +160,7 @@ if submitted:
                 </tr>
             </table>
             
-            <!-- Items Table (8 Columns updated for Discount tracking) ADDED BORDER-TOP HERE -->
+            <!-- Items Table -->
             <table width="100%" cellpadding="4" cellspacing="0" style="border-top: 1px solid #111; border-left: 1px solid #111; border-right: 1px solid #111; border-bottom: 1px solid #111;">
                 <tr style="background-color: #f4f2f5;">
                     <th width="5%" style="border-right: 1px solid #111; border-bottom: 1px solid #111;" class="text-center">#</th>
@@ -169,9 +168,9 @@ if submitted:
                     <th width="10%" style="border-right: 1px solid #111; border-bottom: 1px solid #111; text-align: left;">HSN/ SAC</th>
                     <th width="10%" style="border-right: 1px solid #111; border-bottom: 1px solid #111;" class="text-right">Quantity</th>
                     <th width="8%" style="border-right: 1px solid #111; border-bottom: 1px solid #111;" class="text-center">Unit</th>
-                    <th width="14%" style="border-right: 1px solid #111; border-bottom: 1px solid #111;" class="text-right">Price/ Unit (₹)</th>
-                    <th width="14%" style="border-right: 1px solid #111; border-bottom: 1px solid #111;" class="text-right">Discount (₹)</th>
-                    <th width="14%" style="border-bottom: 1px solid #111;" class="text-right">Amount(₹)</th>
+                    <th width="14%" style="border-right: 1px solid #111; border-bottom: 1px solid #111;" class="text-right">Price/ Unit (Rs.)</th>
+                    <th width="14%" style="border-right: 1px solid #111; border-bottom: 1px solid #111;" class="text-right">Discount (Rs.)</th>
+                    <th width="14%" style="border-bottom: 1px solid #111;" class="text-right">Amount(Rs.)</th>
                 </tr>
                 <tr>
                     <td style="border-right: 1px solid #111;" class="text-center">1</td>
@@ -179,9 +178,9 @@ if submitted:
                     <td style="border-right: 1px solid #111;"></td>
                     <td style="border-right: 1px solid #111;" class="text-right">{hours_qty:g}</td>
                     <td style="border-right: 1px solid #111;" class="text-center">Hur</td>
-                    <td style="border-right: 1px solid #111;" class="text-right">₹ {hourly_standard:,.2f}</td>
-                    <td style="border-right: 1px solid #111;" class="text-right">₹ {item1_discount_amount:,.2f}<br>({item1_discount_percent:.1f}%)</td>
-                    <td class="text-right">₹ {item1_discounted_total:,.2f}</td>
+                    <td style="border-right: 1px solid #111;" class="text-right">Rs. {hourly_standard:,.2f}</td>
+                    <td style="border-right: 1px solid #111;" class="text-right">Rs. {item1_discount_amount:,.2f}<br>({item1_discount_percent:.1f}%)</td>
+                    <td class="text-right">Rs. {item1_discounted_total:,.2f}</td>
                 </tr>
                 {probe_row}
                 <tr>
@@ -199,8 +198,8 @@ if submitted:
                     <td style="border-right: 1px solid #111; border-top: 1px solid #111;" class="bold text-right">{total_qty:g}</td>
                     <td style="border-right: 1px solid #111; border-top: 1px solid #111;"></td>
                     <td style="border-right: 1px solid #111; border-top: 1px solid #111;"></td>
-                    <td style="border-right: 1px solid #111; border-top: 1px solid #111;" class="bold text-right">₹ {total_discount_amount:,.2f}</td>
-                    <td style="border-top: 1px solid #111;" class="bold text-right">₹ {subtotal:,.2f}</td>
+                    <td style="border-right: 1px solid #111; border-top: 1px solid #111;" class="bold text-right">Rs. {total_discount_amount:,.2f}</td>
+                    <td style="border-top: 1px solid #111;" class="bold text-right">Rs. {subtotal:,.2f}</td>
                 </tr>
             </table>
             
@@ -214,8 +213,8 @@ if submitted:
                         <span class="bold">Total</span>
                     </td>
                     <td width="20%" style="border-bottom: 1px solid #111;" class="text-right">
-                        : ₹ {subtotal:,.2f}<br><br>
-                        <span class="bold">: ₹ {total_due:,.2f}</span>
+                        : Rs. {subtotal:,.2f}<br><br>
+                        <span class="bold">: Rs. {total_due:,.2f}</span>
                     </td>
                 </tr>
                 <tr>
@@ -226,7 +225,6 @@ if submitted:
                 </tr>
                 <tr>
                     <td width="60%" style="border-right: 1px solid #111; padding: 6px;">
-                        <!-- Left intentional blank space corresponding to screenshot format -->
                     </td>
                     <td width="20%" style="padding: 6px;">
                         Received<br><br>
@@ -234,9 +232,9 @@ if submitted:
                         <span class="bold">You Saved</span>
                     </td>
                     <td width="20%" style="padding: 6px;" class="text-right">
-                        : ₹ {amount_received:,.2f}<br><br>
-                        : ₹ {balance:,.2f}<br><br>
-                        <span class="bold">: ₹ {total_discount_amount:,.2f}</span>
+                        : Rs. {amount_received:,.2f}<br><br>
+                        : Rs. {balance:,.2f}<br><br>
+                        <span class="bold">: Rs. {total_discount_amount:,.2f}</span>
                     </td>
                 </tr>
             </table>

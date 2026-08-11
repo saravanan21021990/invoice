@@ -120,7 +120,6 @@ if submitted:
         sig_html = f'<img src="{sign_path}" style="max-height: 45px;">' if sign_path else '<br><br>'
 
         # Handle Probe Row
-        # Removed the Rs. 0.00 (0.0%) visual text and replaced with a clean dash "-"
         probe_row = ""
         if probe_cost > 0:
             probe_row = f"""
@@ -148,6 +147,7 @@ if submitted:
             body {{ font-family: Helvetica, Arial, sans-serif; font-size: 10pt; color: #111; }}
             .text-center {{ text-align: center; }}
             .text-right {{ text-align: right; }}
+            .text-left {{ text-align: left; }}
             .bold {{ font-weight: bold; }}
         </style>
         </head>
@@ -157,13 +157,18 @@ if submitted:
             <table width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #111;">
                 <!-- Header -->
                 <tr>
-                    <td width="20%" style="border-right: 1px solid #111; border-bottom: 1px solid #111; text-align: center; padding: 5px;">
+                    <td width="20%" style="border-bottom: 1px solid #111; text-align: left; padding: 8px;">
                         {logo_html}
                     </td>
-                    <td width="80%" style="border-bottom: 1px solid #111; padding: 5px; padding-left: 15px;">
-                        <span style="font-size: 14pt; font-weight: bold; color: #222;">JesRa Electrolysis</span><br><br>
-                        <span style="color: #444;">No.414/69, 9th main, Vijayanagar, Bangalore</span><br><br>
-                        Phone: <strong>9964847715</strong> &nbsp;&nbsp;&nbsp;&nbsp; Email: <strong>jesra.electrolysis@gmail.com</strong>
+                    <td width="80%" style="border-bottom: 1px solid #111; padding: 8px; vertical-align: top;">
+                        <span style="font-size: 16pt; font-weight: bold; color: #222;">JesRa Electrolysis</span><br>
+                        <span style="color: #222;">No.414/69, 9th main, Vijayanagar, Bangalore</span><br><br>
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td width="50%" style="text-align: left;">Phone: <strong>9964847715</strong></td>
+                                <td width="50%" style="text-align: left;">Email: <strong>jesra.electrolysis@gmail.com</strong></td>
+                            </tr>
+                        </table>
                     </td>
                 </tr>
                 

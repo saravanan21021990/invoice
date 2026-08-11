@@ -92,7 +92,7 @@ if submitted:
         if probe_cost > 0:
             probe_row = f"""
             <tr>
-                <td style="border-left: none; text-align: center;">2</td>
+                <td style="border-left: none;" class="text-center">2</td>
                 <td>Probe</td>
                 <td></td>
                 <td class="text-right">1.00</td>
@@ -102,6 +102,7 @@ if submitted:
             </tr>
             """
 
+        # HTML Template using proprietary pdf:widths attribute
         html_template = f"""
         <html>
         <head>
@@ -118,8 +119,7 @@ if submitted:
             
             /* Table Standards */
             table {{ width: 100%; border-collapse: collapse; }}
-            /* PADDING REDUCED TO 4px to prevent availWidth crashes */
-            td, th {{ padding: 4px 6px; vertical-align: top; }}
+            td, th {{ padding: 6px; vertical-align: top; }}
             
             /* Border Utilities */
             .b-bottom {{ border-bottom: 1px solid #111; }}
@@ -135,12 +135,12 @@ if submitted:
             
             <div class="box">
                 <!-- Header Section -->
-                <table class="b-bottom">
+                <table class="b-bottom" width="100%" pdf:widths="25%, 75%">
                     <tr>
-                        <td style="width: 25%; text-align: center;" class="b-right">
+                        <td class="b-right text-center">
                             {logo_html}
                         </td>
-                        <td style="width: 75%; padding-left: 20px; vertical-align: middle;">
+                        <td style="padding-left: 20px; vertical-align: middle;">
                             <span style="font-size: 16pt; font-weight: bold; color: #222;">JesRa Electrolysis</span><br><br>
                             <span style="color: #444;">No.414/69, 9th main, Vijayanagar, Bangalore</span><br><br>
                             Phone: <strong>9964847715</strong> &nbsp;&nbsp;&nbsp;&nbsp; Email: <strong>jesra.electrolysis@gmail.com</strong>
@@ -149,33 +149,33 @@ if submitted:
                 </table>
 
                 <!-- Bill To Section -->
-                <table class="b-bottom">
+                <table class="b-bottom" width="100%" pdf:widths="50%, 50%">
                     <tr class="bg-light b-bottom">
-                        <td style="width: 50%;" class="b-right bold">Bill To:</td>
-                        <td style="width: 50%;" class="bold">Invoice Details:</td>
+                        <td class="b-right bold">Bill To:</td>
+                        <td class="bold">Invoice Details:</td>
                     </tr>
                     <tr>
-                        <td style="width: 50%;" class="b-right">
+                        <td class="b-right">
                             <span class="bold" style="font-size: 12pt;">{client_name.title()}</span><br><br>
                             Contact No: <span class="bold">{contact_no}</span>
                         </td>
-                        <td style="width: 50%;">
+                        <td>
                             No: <span class="bold">{inv_no}</span><br><br>
                             Date: <span class="bold">{date_str}</span>
                         </td>
                     </tr>
                 </table>
 
-                <!-- Items Section: Column Widths Increased to prevent crash -->
-                <table class="items-table" style="border: none; border-bottom: 1px solid #111;">
+                <!-- Items Section -->
+                <table class="items-table" width="100%" pdf:widths="8%, 30%, 12%, 10%, 10%, 15%, 15%" style="border: none; border-bottom: 1px solid #111;">
                     <tr class="bg-light">
-                        <th style="width: 8%; border-top: none; border-left: none;" class="text-center">#</th>
-                        <th style="width: 32%; border-top: none;">Item Name</th>
-                        <th style="width: 12%; border-top: none;">HSN/ SAC</th>
-                        <th style="width: 10%; border-top: none;" class="text-right">Qty</th>
-                        <th style="width: 8%; border-top: none;" class="text-center">Unit</th>
-                        <th style="width: 15%; border-top: none;" class="text-right">Price (₹)</th>
-                        <th style="width: 15%; border-top: none; border-right: none;" class="text-right">Amount(₹)</th>
+                        <th style="border-top: none; border-left: none;" class="text-center">#</th>
+                        <th style="border-top: none;">Item Name</th>
+                        <th style="border-top: none;">HSN/ SAC</th>
+                        <th style="border-top: none;" class="text-right">Qty</th>
+                        <th style="border-top: none;" class="text-center">Unit</th>
+                        <th style="border-top: none;" class="text-right">Price (₹)</th>
+                        <th style="border-top: none; border-right: none;" class="text-right">Amount(₹)</th>
                     </tr>
                     <tr>
                         <td style="border-left: none;" class="text-center">1</td>
@@ -202,15 +202,15 @@ if submitted:
                 </table>
 
                 <!-- Summary Section -->
-                <table class="b-bottom">
+                <table class="b-bottom" width="100%" pdf:widths="60%, 20%, 20%">
                     <tr>
-                        <td style="width: 60%;" class="b-right"></td>
-                        <td style="width: 20%; padding: 8px;">
+                        <td class="b-right"></td>
+                        <td style="padding: 10px;">
                             Sub Total<br><br>
                             {disc_label}
                             <span class="bold">Total</span>
                         </td>
-                        <td style="width: 20%; padding: 8px;" class="text-right">
+                        <td style="padding: 10px;" class="text-right">
                             : ₹ {subtotal:,.2f}<br><br>
                             {disc_val}
                             <span class="bold">: ₹ {total_due:,.2f}</span>
@@ -219,23 +219,23 @@ if submitted:
                 </table>
 
                 <!-- Amount In Words -->
-                <div class="b-bottom" style="padding: 10px;">
+                <div class="b-bottom" style="padding: 12px;">
                     <span class="bold">Invoice Amount In Words :</span><br><br>
                     {amount_words}
                 </div>
 
                 <!-- Footer Section -->
-                <table>
+                <table width="100%" pdf:widths="60%, 20%, 20%">
                     <tr>
-                        <td style="width: 60%; padding: 10px;" class="b-right">
+                        <td style="padding: 12px;" class="b-right">
                             <span class="bold">Description:</span><br><br>
                             {description}
                         </td>
-                        <td style="width: 20%; padding: 10px;">
+                        <td style="padding: 12px;">
                             Received<br><br>
                             Balance
                         </td>
-                        <td style="width: 20%; padding: 10px;" class="text-right">
+                        <td style="padding: 12px;" class="text-right">
                             : ₹ {amount_received:,.2f}<br><br>
                             : ₹ {balance:,.2f}
                         </td>
@@ -244,10 +244,10 @@ if submitted:
             </div>
 
             <!-- Signatory Area -->
-            <table style="margin-top: 15px; border: none;">
+            <table width="100%" pdf:widths="60%, 40%" style="margin-top: 20px; border: none;">
                 <tr>
-                    <td style="width: 60%;"></td>
-                    <td style="width: 40%; text-align: right; border: none;">
+                    <td></td>
+                    <td class="text-right" style="border: none;">
                         <span class="bold">For JesRa Electrolysis:</span><br>
                         {sig_html}<br>
                         <span class="bold">Authorized Signatory</span>

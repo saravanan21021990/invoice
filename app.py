@@ -80,8 +80,8 @@ if submitted:
         logo_path = os.path.abspath("logo.png") if os.path.exists("logo.png") else ""
         sign_path = os.path.abspath("indu_sign.png") if os.path.exists("indu_sign.png") else ""
 
-        logo_html = f'<img src="{logo_path}" style="max-height: 90px;">' if logo_path else '<div style="height: 90px; text-align:center;">LOGO</div>'
-        sig_html = f'<img src="{sign_path}" style="max-height: 50px;">' if sign_path else '<br><br><br>'
+        logo_html = f'<img src="{logo_path}" style="max-height: 80px;">' if logo_path else '<div style="height: 80px; text-align:center;">LOGO</div>'
+        sig_html = f'<img src="{sign_path}" style="max-height: 45px;">' if sign_path else '<br><br>'
 
         # Handle Discount display
         disc_label = f"Discount ({discount_percent:g}%)<br><br>" if discount_percent > 0 else ""
@@ -102,29 +102,29 @@ if submitted:
             </tr>
             """
 
-        # Ultra-basic HTML table layout to bypass xhtml2pdf crashing
+        # Ultra-basic HTML table layout optimized for page fit
         html_template = f"""
         <html>
         <head>
         <style>
-            @page {{ size: A4; margin: 1.5cm; }}
-            body {{ font-family: Helvetica, Arial, sans-serif; font-size: 10.5pt; color: #111; }}
+            @page {{ size: A4; margin: 1.0cm; }}
+            body {{ font-family: Helvetica, Arial, sans-serif; font-size: 10pt; color: #111; }}
             .text-center {{ text-align: center; }}
             .text-right {{ text-align: right; }}
             .bold {{ font-weight: bold; }}
         </style>
         </head>
         <body>
-            <div class="text-center bold" style="font-size: 18pt; margin-bottom: 15px;">Tax Invoice</div>
+            <div class="text-center bold" style="font-size: 16pt; margin-bottom: 10px;">Tax Invoice</div>
             
             <table width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #111;">
                 <!-- Header -->
                 <tr>
-                    <td width="25%" style="border-right: 1px solid #111; border-bottom: 1px solid #111; text-align: center; padding: 10px;">
+                    <td width="20%" style="border-right: 1px solid #111; border-bottom: 1px solid #111; text-align: center; padding: 5px;">
                         {logo_html}
                     </td>
-                    <td width="75%" style="border-bottom: 1px solid #111; padding: 10px; padding-left: 20px;">
-                        <span style="font-size: 15pt; font-weight: bold; color: #222;">JesRa Electrolysis</span><br><br>
+                    <td width="80%" style="border-bottom: 1px solid #111; padding: 5px; padding-left: 15px;">
+                        <span style="font-size: 14pt; font-weight: bold; color: #222;">JesRa Electrolysis</span><br><br>
                         <span style="color: #444;">No.414/69, 9th main, Vijayanagar, Bangalore</span><br><br>
                         Phone: <strong>9964847715</strong> &nbsp;&nbsp;&nbsp;&nbsp; Email: <strong>jesra.electrolysis@gmail.com</strong>
                     </td>
@@ -132,15 +132,15 @@ if submitted:
                 
                 <!-- Bill To & Details -->
                 <tr>
-                    <td width="50%" style="border-right: 1px solid #111; border-bottom: 1px solid #111; background-color: #f4f2f5; padding: 8px;" class="bold">Bill To:</td>
-                    <td width="50%" style="border-bottom: 1px solid #111; background-color: #f4f2f5; padding: 8px;" class="bold">Invoice Details:</td>
+                    <td width="50%" style="border-right: 1px solid #111; border-bottom: 1px solid #111; background-color: #f4f2f5; padding: 5px;" class="bold">Bill To:</td>
+                    <td width="50%" style="border-bottom: 1px solid #111; background-color: #f4f2f5; padding: 5px;" class="bold">Invoice Details:</td>
                 </tr>
                 <tr>
-                    <td width="50%" style="border-right: 1px solid #111; border-bottom: 1px solid #111; padding: 8px;">
-                        <span class="bold" style="font-size: 12pt;">{client_name.title()}</span><br><br>
+                    <td width="50%" style="border-right: 1px solid #111; border-bottom: 1px solid #111; padding: 5px;">
+                        <span class="bold" style="font-size: 11pt;">{client_name.title()}</span><br><br>
                         Contact No: <span class="bold">{contact_no}</span>
                     </td>
-                    <td width="50%" style="border-bottom: 1px solid #111; padding: 8px;">
+                    <td width="50%" style="border-bottom: 1px solid #111; padding: 5px;">
                         No: <span class="bold">{inv_no}</span><br><br>
                         Date: <span class="bold">{date_str}</span>
                     </td>
@@ -148,7 +148,7 @@ if submitted:
             </table>
             
             <!-- Items Table -->
-            <table width="100%" cellpadding="6" cellspacing="0" style="border-left: 1px solid #111; border-right: 1px solid #111; border-bottom: 1px solid #111;">
+            <table width="100%" cellpadding="4" cellspacing="0" style="border-left: 1px solid #111; border-right: 1px solid #111; border-bottom: 1px solid #111;">
                 <tr style="background-color: #f4f2f5;">
                     <th width="8%" style="border-right: 1px solid #111; border-bottom: 1px solid #111;" class="text-center">#</th>
                     <th width="32%" style="border-right: 1px solid #111; border-bottom: 1px solid #111; text-align: left;">Item Name</th>
@@ -169,7 +169,7 @@ if submitted:
                 </tr>
                 {probe_row}
                 <tr>
-                    <td style="border-right: 1px solid #111;"><br><br><br><br><br></td>
+                    <td style="border-right: 1px solid #111;"><br><br><br></td>
                     <td style="border-right: 1px solid #111;"></td>
                     <td style="border-right: 1px solid #111;"></td>
                     <td style="border-right: 1px solid #111;"></td>
@@ -187,7 +187,7 @@ if submitted:
             </table>
             
             <!-- Summary & Footer -->
-            <table width="100%" cellpadding="8" cellspacing="0" style="border-left: 1px solid #111; border-right: 1px solid #111; border-bottom: 1px solid #111;">
+            <table width="100%" cellpadding="5" cellspacing="0" style="border-left: 1px solid #111; border-right: 1px solid #111; border-bottom: 1px solid #111;">
                 <tr>
                     <td width="60%" style="border-right: 1px solid #111; border-bottom: 1px solid #111;">
                     </td>
@@ -203,21 +203,21 @@ if submitted:
                     </td>
                 </tr>
                 <tr>
-                    <td colspan="3" style="border-bottom: 1px solid #111; padding: 10px;">
+                    <td colspan="3" style="border-bottom: 1px solid #111; padding: 6px;">
                         <span class="bold">Invoice Amount In Words :</span><br><br>
                         {amount_words}
                     </td>
                 </tr>
                 <tr>
-                    <td width="60%" style="border-right: 1px solid #111; padding: 10px;">
+                    <td width="60%" style="border-right: 1px solid #111; padding: 6px;">
                         <span class="bold">Description:</span><br><br>
                         {description}
                     </td>
-                    <td width="20%" style="padding: 10px;">
+                    <td width="20%" style="padding: 6px;">
                         Received<br><br>
                         Balance
                     </td>
-                    <td width="20%" style="padding: 10px;" class="text-right">
+                    <td width="20%" style="padding: 6px;" class="text-right">
                         : ₹ {amount_received:,.2f}<br><br>
                         : ₹ {balance:,.2f}
                     </td>
@@ -225,7 +225,7 @@ if submitted:
             </table>
             
             <!-- Signatory -->
-            <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 20px;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 5px;">
                 <tr>
                     <td width="60%"></td>
                     <td width="40%" class="text-right">

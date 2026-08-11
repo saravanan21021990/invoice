@@ -116,7 +116,7 @@ if submitted:
         logo_path = os.path.abspath("logo.png") if os.path.exists("logo.png") else ""
         sign_path = os.path.abspath("indu_sign.png") if os.path.exists("indu_sign.png") else ""
 
-        logo_html = f'<img src="{logo_path}" style="max-height: 80px;">' if logo_path else '<div style="height: 80px; text-align:center;">LOGO</div>'
+        logo_html = f'<img src="{logo_path}" style="max-height: 80px;">' if logo_path else '<div style="height: 80px; text-align:left;">LOGO</div>'
         sig_html = f'<img src="{sign_path}" style="max-height: 45px;">' if sign_path else '<br><br>'
 
         # Handle Probe Row
@@ -135,7 +135,6 @@ if submitted:
             </tr>
             """
 
-        # Ensure item name is not completely blank in the PDF
         display_item_name = item_name if item_name.strip() else "Electrolysis"
 
         # HTML table layout
@@ -154,35 +153,32 @@ if submitted:
         <body>
             <div class="text-center bold" style="font-size: 16pt; margin-bottom: 10px;">Tax Invoice</div>
             
-            <table width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #111;">
-                <!-- Header -->
+            <!-- Header (Explicit Borders on TDs to remove middle line and fix alignment) -->
+            <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                    <td width="20%" style="border-bottom: 1px solid #111; text-align: left; padding: 8px;">
+                    <td width="25%" style="border-top: 1px solid #111; border-left: 1px solid #111; border-bottom: 1px solid #111; text-align: left; vertical-align: middle; padding: 10px;">
                         {logo_html}
                     </td>
-                    <td width="80%" style="border-bottom: 1px solid #111; padding: 8px; vertical-align: top;">
+                    <td width="75%" style="border-top: 1px solid #111; border-right: 1px solid #111; border-bottom: 1px solid #111; padding: 10px; vertical-align: middle;">
                         <span style="font-size: 16pt; font-weight: bold; color: #222;">JesRa Electrolysis</span><br>
                         <span style="color: #222;">No.414/69, 9th main, Vijayanagar, Bangalore</span><br><br>
-                        <table width="100%" cellpadding="0" cellspacing="0">
-                            <tr>
-                                <td width="50%" style="text-align: left;">Phone: <strong>9964847715</strong></td>
-                                <td width="50%" style="text-align: left;">Email: <strong>jesra.electrolysis@gmail.com</strong></td>
-                            </tr>
-                        </table>
+                        Phone: <strong>9964847715</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Email: <strong>jesra.electrolysis@gmail.com</strong>
                     </td>
                 </tr>
-                
-                <!-- Bill To & Details -->
+            </table>
+            
+            <!-- Bill To & Details -->
+            <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                    <td width="50%" style="border-right: 1px solid #111; border-bottom: 1px solid #111; background-color: #f4f2f5; padding: 5px;" class="bold">Bill To:</td>
-                    <td width="50%" style="border-bottom: 1px solid #111; background-color: #f4f2f5; padding: 5px;" class="bold">Invoice Details:</td>
+                    <td width="50%" style="border-left: 1px solid #111; border-right: 1px solid #111; border-bottom: 1px solid #111; background-color: #f4f2f5; padding: 5px;" class="bold">Bill To:</td>
+                    <td width="50%" style="border-right: 1px solid #111; border-bottom: 1px solid #111; background-color: #f4f2f5; padding: 5px;" class="bold">Invoice Details:</td>
                 </tr>
                 <tr>
-                    <td width="50%" style="border-right: 1px solid #111; border-bottom: 1px solid #111; padding: 5px;">
+                    <td width="50%" style="border-left: 1px solid #111; border-right: 1px solid #111; border-bottom: 1px solid #111; padding: 5px;">
                         <span class="bold" style="font-size: 11pt;">{client_name.title()}</span><br><br>
                         Contact No: <span class="bold">{contact_no}</span>
                     </td>
-                    <td width="50%" style="border-bottom: 1px solid #111; padding: 5px;">
+                    <td width="50%" style="border-right: 1px solid #111; border-bottom: 1px solid #111; padding: 5px;">
                         No: <span class="bold">{inv_no}</span><br><br>
                         Date: <span class="bold">{date_str}</span>
                     </td>
@@ -190,7 +186,7 @@ if submitted:
             </table>
             
             <!-- Items Table -->
-            <table width="100%" cellpadding="4" cellspacing="0" style="border-top: 1px solid #111; border-left: 1px solid #111; border-right: 1px solid #111; border-bottom: 1px solid #111;">
+            <table width="100%" cellpadding="4" cellspacing="0" style="border-left: 1px solid #111; border-right: 1px solid #111; border-bottom: 1px solid #111;">
                 <tr style="background-color: #f4f2f5;">
                     <th width="5%" style="border-right: 1px solid #111; border-bottom: 1px solid #111;" class="text-center">#</th>
                     <th width="25%" style="border-right: 1px solid #111; border-bottom: 1px solid #111; text-align: left;">Item Name</th>
@@ -293,7 +289,6 @@ if submitted:
                 else:
                     pdf_bytes = pdf_buffer.getvalue()
                     
-                    # Successfully generated PDF, let's increment the file!
                     increment_invoice_no()
                     
                     st.success("Invoice generated successfully!")

@@ -161,8 +161,8 @@ if submitted:
                 </tr>
             </table>
             
-            <!-- Items Table (8 Columns updated for Discount tracking) -->
-            <table width="100%" cellpadding="4" cellspacing="0" style="border-left: 1px solid #111; border-right: 1px solid #111; border-bottom: 1px solid #111;">
+            <!-- Items Table (8 Columns updated for Discount tracking) ADDED BORDER-TOP HERE -->
+            <table width="100%" cellpadding="4" cellspacing="0" style="border-top: 1px solid #111; border-left: 1px solid #111; border-right: 1px solid #111; border-bottom: 1px solid #111;">
                 <tr style="background-color: #f4f2f5;">
                     <th width="5%" style="border-right: 1px solid #111; border-bottom: 1px solid #111;" class="text-center">#</th>
                     <th width="25%" style="border-right: 1px solid #111; border-bottom: 1px solid #111; text-align: left;">Item Name</th>

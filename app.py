@@ -87,12 +87,12 @@ if submitted:
         if discount_percent > 0:
             discount_html = f"""
             <tr>
-                <td style="padding: 4px 8px;">Discount ({discount_percent:g}%)</td>
-                <td class="text-right" style="padding: 4px 8px;">: - ₹ {discount_amount:,.2f}</td>
+                <td style="padding: 4px;">Discount ({discount_percent:g}%)</td>
+                <td class="text-right" style="padding: 4px;">: - ₹ {discount_amount:,.2f}</td>
             </tr>
             """
 
-        # HTML Template optimized for xhtml2pdf
+        # HTML Template optimized for xhtml2pdf padding bug
         html_template = f"""
         <html>
         <head>
@@ -102,7 +102,8 @@ if submitted:
             .invoice-header {{ text-align: center; font-size: 18pt; font-weight: bold; margin-bottom: 15px; }}
             .box {{ border: 1px solid #111; }}
             table {{ width: 100%; border-collapse: collapse; }}
-            td, th {{ padding: 6px 8px; vertical-align: top; }}
+            /* Reduced padding from 6px 8px to 4px to prevent availWidth errors */
+            td, th {{ padding: 4px; vertical-align: top; }}
             .border-bottom {{ border-bottom: 1px solid #111; }}
             .border-right {{ border-right: 1px solid #111; }}
             .border-top {{ border-top: 1px solid #111; }}
@@ -149,11 +150,11 @@ if submitted:
                 <!-- Items -->
                 <table class="border-bottom">
                     <tr class="bg-light">
-                        <td class="border-right border-bottom text-center" style="width: 5%;">#</td>
-                        <td class="border-right border-bottom" style="width: 32%;">Item Name</td>
-                        <td class="border-right border-bottom" style="width: 14%;">HSN/ SAC</td>
+                        <td class="border-right border-bottom text-center" style="width: 7%;">#</td>
+                        <td class="border-right border-bottom" style="width: 30%;">Item Name</td>
+                        <td class="border-right border-bottom" style="width: 13%;">HSN/ SAC</td>
                         <td class="border-right border-bottom text-right" style="width: 12%;">Quantity</td>
-                        <td class="border-right border-bottom text-center" style="width: 9%;">Unit</td>
+                        <td class="border-right border-bottom text-center" style="width: 10%;">Unit</td>
                         <td class="border-right border-bottom text-right" style="width: 14%;">Price/ Unit (₹)</td>
                         <td class="border-bottom text-right" style="width: 14%;">Amount(₹)</td>
                     </tr>
@@ -187,13 +188,13 @@ if submitted:
                         <td style="width: 48%; padding: 0;">
                             <table>
                                 <tr>
-                                    <td style="padding: 4px 8px;">Sub Total</td>
-                                    <td class="text-right" style="padding: 4px 8px;">: ₹ {subtotal:,.2f}</td>
+                                    <td style="padding: 4px;">Sub Total</td>
+                                    <td class="text-right" style="padding: 4px;">: ₹ {subtotal:,.2f}</td>
                                 </tr>
                                 {discount_html}
                                 <tr>
-                                    <td class="border-top bold" style="padding: 4px 8px;">Total</td>
-                                    <td class="border-top bold text-right" style="padding: 4px 8px;">: ₹ {total_due:,.2f}</td>
+                                    <td class="border-top bold" style="padding: 4px;">Total</td>
+                                    <td class="border-top bold text-right" style="padding: 4px;">: ₹ {total_due:,.2f}</td>
                                 </tr>
                             </table>
                         </td>
@@ -216,12 +217,12 @@ if submitted:
                         <td style="width: 48%; padding: 0;">
                             <table>
                                 <tr>
-                                    <td style="padding: 4px 8px;">Received</td>
-                                    <td class="text-right" style="padding: 4px 8px;">: ₹ {amount_received:,.2f}</td>
+                                    <td style="padding: 4px;">Received</td>
+                                    <td class="text-right" style="padding: 4px;">: ₹ {amount_received:,.2f}</td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 4px 8px;">Balance</td>
-                                    <td class="text-right" style="padding: 4px 8px;">: ₹ {balance:,.2f}</td>
+                                    <td style="padding: 4px;">Balance</td>
+                                    <td class="text-right" style="padding: 4px;">: ₹ {balance:,.2f}</td>
                                 </tr>
                             </table>
                         </td>

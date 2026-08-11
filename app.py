@@ -35,25 +35,26 @@ st.markdown("Generate and download professional PDF invoices directly to your de
 
 # --- Input Form ---
 with st.form("invoice_form"):
-    st.subheader("1. Clinic & Rate Settings")
-    col1, col2 = st.columns(2)
-    inv_no = col1.text_input("Invoice Number", value="1")
-    base_rate = col2.number_input("Base Rate (per 30 mins ₹)", min_value=1.0, value=800.0, step=50.0)
-
+    st.subheader("1. Clinic Settings")
+    inv_no = st.text_input("Invoice Number", value="4")
+    
     st.subheader("2. Client Details")
     client_name = st.text_input("Client Name", placeholder="e.g., Kavya")
     contact_no = st.text_input("Contact Number", placeholder="e.g., 9632036238")
 
-    st.subheader("3. Service Details")
+    st.subheader("3. Service & Rate Details")
     col3, col4 = st.columns(2)
-    duration_minutes = col3.number_input("Duration (minutes)", min_value=0.0, value=30.0, step=5.0)
+    duration_minutes = col3.number_input("Duration (minutes)", min_value=0.0, value=240.0, step=30.0)
     probe_cost = col4.number_input("Probe Charge (₹)", min_value=0.0, value=300.0, step=10.0)
     
     col5, col6 = st.columns(2)
-    discount_percent = col5.number_input("Discount (%)", min_value=0.0, max_value=100.0, value=0.0, step=5.0)
-    amount_received = col6.number_input("Amount Received (₹)", min_value=0.0, value=0.0, step=50.0)
+    # New inputs for Standard vs Discounted Pricing
+    standard_rate_30m = col5.number_input("Standard Base Price (per 30 mins ₹)", min_value=1.0, value=800.0, step=50.0)
+    discounted_rate_30m = col6.number_input("Discounted Price (per 30 mins ₹)", min_value=0.0, value=700.0, step=50.0)
     
-    description = st.text_input("Description", value="Chin, beard, mustache trimming")
+    col7, col8 = st.columns(2)
+    amount_received = col7.number_input("Amount Received (₹)", min_value=0.0, value=5900.0, step=50.0)
+    item_name = col8.text_input("Item Name / Description", value="Fine hair")
 
     submitted = st.form_submit_button("Generate PDF Invoice")
 
@@ -62,16 +63,32 @@ if submitted:
     if not client_name:
         st.error("Please enter a client name.")
     else:
-        # Calculations
-        rate_per_minute = base_rate / 30.0
-        service_amount = rate_per_minute * duration_minutes
-        subtotal = service_amount + probe_cost
-        discount_amount = subtotal * (discount_percent / 100.0)
-        total_due = subtotal - discount_amount
-        balance = total_due - amount_received
-        
+        # --- Calculations ---
         hours_qty = duration_minutes / 60.0
         total_qty = hours_qty + (1 if probe_cost > 0 else 0)
+        
+        # Calculate Hourly Rates based on the 30-min inputs
+        hourly_standard = standard_rate_30m * 2
+        hourly_discounted = discounted_rate_30m * 2
+        
+        # Totals for the Primary Service
+        item1_standard_total = hourly_standard * hours_qty
+        item1_discounted_total = hourly_discounted * hours_qty
+        item1_discount_amount = item1_standard_total - item1_discounted_total
+        
+        # Percentage Calculation
+        item1_discount_percent = (item1_discount_amount / item1_standard_total * 100) if item1_standard_total > 0 else 0
+        
+        # Probe Totals (Probe usually doesn't have a discount)
+        probe_discount_amount = 0.0
+        probe_total = probe_cost
+        
+        # Overall Totals
+        total_discount_amount = item1_discount_amount + probe_discount_amount
+        subtotal = item1_discounted_total + probe_total
+        
+        total_due = subtotal
+        balance = total_due - amount_received
         
         date_str = datetime.now().strftime("%d-%m-%Y")
         amount_words = number_to_words(int(round(total_due)))
@@ -83,26 +100,23 @@ if submitted:
         logo_html = f'<img src="{logo_path}" style="max-height: 80px;">' if logo_path else '<div style="height: 80px; text-align:center;">LOGO</div>'
         sig_html = f'<img src="{sign_path}" style="max-height: 45px;">' if sign_path else '<br><br>'
 
-        # Handle Discount display
-        disc_label = f"Discount ({discount_percent:g}%)<br><br>" if discount_percent > 0 else ""
-        disc_val = f": - ₹ {discount_amount:,.2f}<br><br>" if discount_percent > 0 else ""
-
-        # Handle Probe Row
+        # Handle Probe Row with new structure
         probe_row = ""
         if probe_cost > 0:
             probe_row = f"""
             <tr>
                 <td style="border-right: 1px solid #111;" class="text-center">2</td>
-                <td style="border-right: 1px solid #111;">Probe</td>
+                <td style="border-right: 1px solid #111;">Probe F2</td>
                 <td style="border-right: 1px solid #111;"></td>
-                <td style="border-right: 1px solid #111;" class="text-right">1.00</td>
+                <td style="border-right: 1px solid #111;" class="text-right">1</td>
                 <td style="border-right: 1px solid #111;" class="text-center">-</td>
                 <td style="border-right: 1px solid #111;" class="text-right">₹ {probe_cost:,.2f}</td>
+                <td style="border-right: 1px solid #111;" class="text-right">₹ 0.00<br>(0.0%)</td>
                 <td class="text-right">₹ {probe_cost:,.2f}</td>
             </tr>
             """
 
-        # Ultra-basic HTML table layout optimized for page fit
+        # HTML table layout matching your screenshot
         html_template = f"""
         <html>
         <head>
@@ -147,25 +161,27 @@ if submitted:
                 </tr>
             </table>
             
-            <!-- Items Table (Top border added to fix missing line) -->
-            <table width="100%" cellpadding="4" cellspacing="0" style="border-top: 1px solid #111; border-left: 1px solid #111; border-right: 1px solid #111; border-bottom: 1px solid #111;">
+            <!-- Items Table (8 Columns updated for Discount tracking) -->
+            <table width="100%" cellpadding="4" cellspacing="0" style="border-left: 1px solid #111; border-right: 1px solid #111; border-bottom: 1px solid #111;">
                 <tr style="background-color: #f4f2f5;">
-                    <th width="8%" style="border-right: 1px solid #111; border-bottom: 1px solid #111;" class="text-center">#</th>
-                    <th width="32%" style="border-right: 1px solid #111; border-bottom: 1px solid #111; text-align: left;">Item Name</th>
-                    <th width="12%" style="border-right: 1px solid #111; border-bottom: 1px solid #111; text-align: left;">HSN/ SAC</th>
-                    <th width="10%" style="border-right: 1px solid #111; border-bottom: 1px solid #111;" class="text-right">Qty</th>
-                    <th width="10%" style="border-right: 1px solid #111; border-bottom: 1px solid #111;" class="text-center">Unit</th>
-                    <th width="14%" style="border-right: 1px solid #111; border-bottom: 1px solid #111;" class="text-right">Price (₹)</th>
+                    <th width="5%" style="border-right: 1px solid #111; border-bottom: 1px solid #111;" class="text-center">#</th>
+                    <th width="25%" style="border-right: 1px solid #111; border-bottom: 1px solid #111; text-align: left;">Item Name</th>
+                    <th width="10%" style="border-right: 1px solid #111; border-bottom: 1px solid #111; text-align: left;">HSN/ SAC</th>
+                    <th width="10%" style="border-right: 1px solid #111; border-bottom: 1px solid #111;" class="text-right">Quantity</th>
+                    <th width="8%" style="border-right: 1px solid #111; border-bottom: 1px solid #111;" class="text-center">Unit</th>
+                    <th width="14%" style="border-right: 1px solid #111; border-bottom: 1px solid #111;" class="text-right">Price/ Unit (₹)</th>
+                    <th width="14%" style="border-right: 1px solid #111; border-bottom: 1px solid #111;" class="text-right">Discount (₹)</th>
                     <th width="14%" style="border-bottom: 1px solid #111;" class="text-right">Amount(₹)</th>
                 </tr>
                 <tr>
                     <td style="border-right: 1px solid #111;" class="text-center">1</td>
-                    <td style="border-right: 1px solid #111;">Electrolysis</td>
+                    <td style="border-right: 1px solid #111;">{item_name}</td>
                     <td style="border-right: 1px solid #111;"></td>
-                    <td style="border-right: 1px solid #111;" class="text-right">{hours_qty:.2f}</td>
+                    <td style="border-right: 1px solid #111;" class="text-right">{hours_qty:g}</td>
                     <td style="border-right: 1px solid #111;" class="text-center">Hur</td>
-                    <td style="border-right: 1px solid #111;" class="text-right">₹ {base_rate * 2:,.2f}</td>
-                    <td class="text-right">₹ {service_amount:,.2f}</td>
+                    <td style="border-right: 1px solid #111;" class="text-right">₹ {hourly_standard:,.2f}</td>
+                    <td style="border-right: 1px solid #111;" class="text-right">₹ {item1_discount_amount:,.2f}<br>({item1_discount_percent:.1f}%)</td>
+                    <td class="text-right">₹ {item1_discounted_total:,.2f}</td>
                 </tr>
                 {probe_row}
                 <tr>
@@ -175,13 +191,15 @@ if submitted:
                     <td style="border-right: 1px solid #111;"></td>
                     <td style="border-right: 1px solid #111;"></td>
                     <td style="border-right: 1px solid #111;"></td>
+                    <td style="border-right: 1px solid #111;"></td>
                     <td></td>
                 </tr>
                 <tr>
                     <td colspan="3" style="border-right: 1px solid #111; border-top: 1px solid #111;" class="bold text-right">Total</td>
-                    <td style="border-right: 1px solid #111; border-top: 1px solid #111;" class="bold text-right">{total_qty:.2f}</td>
+                    <td style="border-right: 1px solid #111; border-top: 1px solid #111;" class="bold text-right">{total_qty:g}</td>
                     <td style="border-right: 1px solid #111; border-top: 1px solid #111;"></td>
                     <td style="border-right: 1px solid #111; border-top: 1px solid #111;"></td>
+                    <td style="border-right: 1px solid #111; border-top: 1px solid #111;" class="bold text-right">₹ {total_discount_amount:,.2f}</td>
                     <td style="border-top: 1px solid #111;" class="bold text-right">₹ {subtotal:,.2f}</td>
                 </tr>
             </table>
@@ -193,12 +211,10 @@ if submitted:
                     </td>
                     <td width="20%" style="border-bottom: 1px solid #111;">
                         Sub Total<br><br>
-                        {disc_label}
                         <span class="bold">Total</span>
                     </td>
                     <td width="20%" style="border-bottom: 1px solid #111;" class="text-right">
                         : ₹ {subtotal:,.2f}<br><br>
-                        {disc_val}
                         <span class="bold">: ₹ {total_due:,.2f}</span>
                     </td>
                 </tr>
@@ -210,16 +226,17 @@ if submitted:
                 </tr>
                 <tr>
                     <td width="60%" style="border-right: 1px solid #111; padding: 6px;">
-                        <span class="bold">Description:</span><br><br>
-                        {description}
+                        <!-- Left intentional blank space corresponding to screenshot format -->
                     </td>
                     <td width="20%" style="padding: 6px;">
                         Received<br><br>
-                        Balance
+                        Balance<br><br>
+                        <span class="bold">You Saved</span>
                     </td>
                     <td width="20%" style="padding: 6px;" class="text-right">
                         : ₹ {amount_received:,.2f}<br><br>
-                        : ₹ {balance:,.2f}
+                        : ₹ {balance:,.2f}<br><br>
+                        <span class="bold">: ₹ {total_discount_amount:,.2f}</span>
                     </td>
                 </tr>
             </table>

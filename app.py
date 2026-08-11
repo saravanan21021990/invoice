@@ -45,14 +45,15 @@ with st.form("invoice_form"):
     st.subheader("3. Service & Rate Details")
     col3, col4 = st.columns(2)
     duration_minutes = col3.number_input("Duration (minutes)", min_value=0.0, value=240.0, step=30.0)
-    probe_cost = col4.number_input("Probe Charge (₹)", min_value=0.0, value=300.0, step=10.0)
+    probe_cost = col4.number_input("Probe Charge (Rs.)", min_value=0.0, value=300.0, step=10.0)
     
     col5, col6 = st.columns(2)
-    standard_rate_30m = col5.number_input("Standard Base Price (per 30 mins ₹)", min_value=1.0, value=800.0, step=50.0)
-    discounted_rate_30m = col6.number_input("Discounted Price (per 30 mins ₹)", min_value=0.0, value=700.0, step=50.0)
+    standard_rate_30m = col5.number_input("Standard Base Price (per 30 mins Rs.)", min_value=1.0, value=800.0, step=50.0)
+    # Changed to take the direct discount amount instead of the discounted price
+    discount_per_30m = col6.number_input("Discount (per 30 mins Rs.)", min_value=0.0, value=100.0, step=50.0)
     
     col7, col8 = st.columns(2)
-    amount_received = col7.number_input("Amount Received (₹)", min_value=0.0, value=5900.0, step=50.0)
+    amount_received = col7.number_input("Amount Received (Rs.)", min_value=0.0, value=5900.0, step=50.0)
     item_name = col8.text_input("Item Name / Description", value="Fine hair")
 
     submitted = st.form_submit_button("Generate PDF Invoice")
@@ -68,17 +69,17 @@ if submitted:
         
         # Calculate Hourly Rates based on the 30-min inputs
         hourly_standard = standard_rate_30m * 2
-        hourly_discounted = discounted_rate_30m * 2
+        hourly_discount = discount_per_30m * 2
         
         # Totals for the Primary Service
         item1_standard_total = hourly_standard * hours_qty
-        item1_discounted_total = hourly_discounted * hours_qty
-        item1_discount_amount = item1_standard_total - item1_discounted_total
+        item1_discount_amount = hourly_discount * hours_qty
+        item1_discounted_total = item1_standard_total - item1_discount_amount
         
         # Percentage Calculation
         item1_discount_percent = (item1_discount_amount / item1_standard_total * 100) if item1_standard_total > 0 else 0
         
-        # Probe Totals
+        # Probe Totals (No discount applied to probe)
         probe_discount_amount = 0.0
         probe_total = probe_cost
         
